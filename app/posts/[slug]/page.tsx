@@ -1,6 +1,10 @@
 import dbConnect from '@/lib/mongodb';
 import Post from '@/models/Post';
 import { notFound } from 'next/navigation';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
+import 'highlight.js/styles/atom-one-dark.css';
 
 async function getPost(slug: string) {
     await dbConnect();
@@ -27,9 +31,12 @@ export default async function PostPage({ params }: { params: { slug: string } })
                 {new Date(post.createdAt).toLocaleDateString('zh-CN')}
             </time>
             <div className="prose prose-lg max-w-none">
-                {post.content.split('\n').map((paragraph: string, i: number) => (
-                    <p key={i}>{paragraph}</p>
-                ))}
+                <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeHighlight]}
+                >
+                    {post.content}
+                </ReactMarkdown>
             </div>
         </article>
     );
